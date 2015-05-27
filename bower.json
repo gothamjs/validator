@@ -1,0 +1,24 @@
+{
+  "name": "validator",
+  "moduleType": "globals",
+  "homepage": "https://github.com/Gotham-Framework/validator",
+  "authors": [
+    "Ges Jeremie <bonjour@gesjeremie.fr>"
+  ],
+  "description": "Strings validation in javascript for the browser",
+  "main": "dist/validator.js",
+  "keywords": [
+    "gotham-validator"
+  ],
+  "license": "MIT",
+  "ignore": [
+    "**/.*",
+    "node_modules",
+    "bower_components",
+    "test",
+    "tests"
+  ],
+  "devDependencies": {
+    "qunit": "~1.17.1"
+  }
+}
