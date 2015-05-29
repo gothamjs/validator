@@ -3,13 +3,15 @@
   this.Validator = (function() {
     Validator._rules = {};
 
+    Validator._messages = {};
+
+    Validator._attributes = {};
+
     function Validator() {
       this._rulesToValidate = {};
       this._datasToValidate = {};
       this._success = true;
       this._errors = {};
-      this._messages = {};
-      this._attributes = {};
     }
 
     Validator.prototype.make = function(datas, rules) {
@@ -25,42 +27,11 @@
       return this._run();
     };
 
-    Validator.prototype.errors = function() {
-      return this._errors;
-
-      /*
-      switch type
-      
-        when 'first'
-      
-          if @_errors[attribute]?
-      
-            return _.first(@_errors[attribute])
-      
-        when 'last'
-      
-          if @_errors[attribute]
-      
-            return _.last(@_errors[attribute])
-      
-        when 'all'
-      
-          errors = []
-      
-          _.each @_errors, (attributes) =>
-      
-            for error in attributes
-      
-              errors.push error
-      
-          return errors
-          
-        when 'get'
-      
-          if @_errors[attribute]?
-      
-            return @_errors[attribute]
-       */
+    Validator.prototype.errors = {
+      first: function() {},
+      last: function() {},
+      all: function() {},
+      get: function() {}
     };
 
     Validator.prototype.passes = function() {
@@ -74,7 +45,7 @@
       return false;
     };
 
-    Validator.prototype.error = function(rule, message) {
+    Validator.error = function(rule, message) {
       return this._messages[rule] = message;
     };
 
@@ -82,31 +53,35 @@
       return this._rules[name] = callback;
     };
 
-    Validator.prototype.attributes = function(attributes) {
-      return _.each(attributes, (function(_this) {
-        return function(attribute, index) {
-          return _this._attributes[index] = attribute;
-        };
-      })(this));
+    Validator.attributes = function(attributes) {
+      var attribute, index, _results;
+      _results = [];
+      for (index in attributes) {
+        attribute = attributes[index];
+        _results.push(Validator._attributes[index] = attribute);
+      }
+      return _results;
     };
 
     Validator.prototype._run = function() {
-      var error, index, input, result, rule, value, _ref, _results;
+      var error, index, input, result, rules, value, _ref, _results;
       _ref = this._rulesToValidate;
       _results = [];
       for (input in _ref) {
-        rule = _ref[input];
+        rules = _ref[input];
         _results.push((function() {
           var _results1;
           _results1 = [];
-          for (index in rule) {
-            value = rule[index];
+          for (index in rules) {
+            value = rules[index];
+            console.log(index);
+            console.log(value);
             if ((Validator._rules[index] != null) && (this._datasToValidate[input] != null)) {
               result = Validator._rules[index](input, this._datasToValidate[input], value, this._datasToValidate);
               if (!result) {
                 this._success = false;
-                if (this._messages[index] != null) {
-                  error = this._createErrorMessage(this._messages[index], input, value);
+                if (Validator._messages[index] != null) {
+                  error = this._createErrorMessage(Validator._messages[index], input, value);
                 } else {
                   error = '[Rule ' + index + '] No error message for this rule';
                 }
@@ -130,19 +105,19 @@
 
     Validator.prototype._createErrorMessage = function(string, attribute, value) {
       var index, option, _i, _len;
-      if (this._attributes[attribute] != null) {
-        attribute = this._attributes[attribute];
+      if (Validator._attributes[attribute] != null) {
+        attribute = Validator._attributes[attribute];
       }
       string = string.split(':attribute').join(attribute);
-      if (value != null) {
+      if (value.length > 0) {
         if (value.indexOf(',') !== -1) {
-          string = string.split(':options').join(value.join(', '));
+          string = string.split(':values').join(value.join(', '));
         } else {
-          string = string.split(':options').join(value);
+          string = string.split(':values').join(value);
         }
         for (index = _i = 0, _len = value.length; _i < _len; index = ++_i) {
           option = value[index];
-          string = string.split(':option' + index).join(option);
+          string = string.split(':value' + (index + 1)).join(option);
         }
       }
       return string;
@@ -162,7 +137,7 @@
             parsed[attribute[0]] = options;
           }
         } else {
-          parsed[rule] = {};
+          parsed[rule] = [];
         }
       }
       return parsed;

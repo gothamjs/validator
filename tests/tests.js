@@ -1,6 +1,6 @@
 module('Pre-Test');
 
-test("Can mount rules", 3, function() {
+test("Can mount rules", 2, function() {
 
   Validator.rule('required', function() {});
 
@@ -10,10 +10,35 @@ test("Can mount rules", 3, function() {
 
   deepEqual(typeof Validator._rules['email'], "function", "The rule email mounted");
 
-  // We must have 2 rules in the object
-  deepEqual(Object.keys(Validator._rules).length, 2, "We have 2 rules");
+  Validator._rules = {};
 });
 
+test("Can mount errors", 2, function() {
+
+  Validator.error('required', 'The :attribute is required');
+  Validator.error('email', 'The :attribute must be an email');
+
+  deepEqual(Validator._messages['required'], 'The :attribute is required');
+  deepEqual(Validator._messages['email'], 'The :attribute must be an email');
+
+  Validator._messages = {};
+
+});
+
+test("Can mount attributes", 2, function() {
+
+  Validator.attributes({
+    "user[email]": "email",
+    "user[name]": "name"
+  });
+
+  deepEqual(Validator._attributes['user[email]'], 'email');
+  deepEqual(Validator._attributes['user[name]'], 'name');
+
+  // Reset after
+  Validator._attributes = {};
+
+});
 
 module('Validator', {
 
@@ -32,6 +57,10 @@ module('Validator', {
 
     });
 
+    Validator.error('required', 'The :attribute is required');
+
+    //-----------------------------------
+
     // Email check
     Validator.rule('email', function(attribute, value, params) {
 
@@ -39,6 +68,10 @@ module('Validator', {
       return valid_email.test(value);
 
     });
+
+    Validator.error('email', 'The :attribute must be an email');
+
+    //-----------------------------------
 
     // Boolean check
     Validator.rule('boolean', function(attribute, value, params) {
@@ -52,6 +85,10 @@ module('Validator', {
 
     });
 
+    Validator.error('boolean', 'The :attribute must be a boolean');
+
+    //-----------------------------------
+
     // Size
     Validator.rule('size', function(attribute, value, params) {
 
@@ -62,6 +99,19 @@ module('Validator', {
       return true;
 
     });
+
+    Validator.error('size', 'The size of :attribute must be :values length');
+
+    //-----------------------------------
+
+    // Fake
+    Validator.rule('fake', function(attribute, value, params) {
+
+      return false;
+
+    });
+
+    Validator.error('fake', 'It\'s a fake rule to test some values :value1 and :value2 and :value3');
 
   }
 
@@ -84,12 +134,13 @@ test('Must parse correctly the rules to validate', 1, function() {
 
   deepEqual(validation._rulesToValidate, {
     "email": {
-      "required": {},
-      "email": {}
+      "required": [],
+      "email": []
     }
   });
 
 });
+
 
 test('Must parse correctly the options of a rule', 2, function() {
 
@@ -130,4 +181,85 @@ test('Must parse correctly the options of a rule', 2, function() {
 
 });
 
+test('The validation must fails', 1, function() {
 
+  datas = {
+    "name": "jeremie"
+  };
+
+  rules = {
+    "name": "size:5"
+  };
+
+  validation = new Validator();
+
+  validation.make(datas, rules);
+
+  deepEqual(validation._success, false);
+
+});
+
+test('The validation must pass', 1, function() {
+
+   datas = {
+    "name": "jeremie",
+    "email": "bonjour@gesjeremie.fr"
+  };
+
+  rules = {
+    "name": "size:7",
+    "email": "email"
+  };
+
+  validation = new Validator();
+
+  validation.make(datas, rules);
+
+  deepEqual(validation._success, true);
+
+}); 
+
+test('Must parse correctly the errors', 3, function() {
+
+  datas = {
+    "name": "",
+    "user[name]": "jeremie",
+    "fake": "fake value"
+  };
+
+  rules = {
+    "name": "required",
+    "user[name]": "size:1",
+    "fake": "fake:test,other,again"
+  };
+
+  validation = new Validator();
+
+  validation.make(datas, rules);
+
+  deepEqual(validation._errors['name'][0], 'The name is required');
+  deepEqual(validation._errors['user[name]'][0], 'The size of user[name] must be 1 length');
+  deepEqual(validation._errors['fake'][0], 'It\'s a fake rule to test some values test and other and again')
+});
+
+test('Must parse correctly the custom attributes', 1, function() {
+    
+  Validator.attributes({
+    "user[name]": "name"
+  });
+
+  datas = {
+    "user[name]": ""
+  };
+
+  rules = {
+    "user[name]": "required",
+  };
+
+  validation = new Validator();
+
+  validation.make(datas, rules);
+
+  deepEqual(validation._errors['user[name]'][0], 'The name is required');
+
+});

@@ -12,6 +12,12 @@ class @Validator
   # Rules function to validate datas
   @_rules = {}
 
+  # Custom messages for errors
+  @_messages = {}
+
+  # Humanify attributes (Ex. user[email] -> email)
+  @_attributes = {}
+
   ##
   # Constructor
   #
@@ -29,14 +35,8 @@ class @Validator
     # Flag to know if the datas are valid or not
     @_success = true
 
-    # Each errors found
+    # Each errors found after _run() method called
     @_errors = {}
-
-    # Messages for errors
-    @_messages = {}
-
-    # Humanify attributes (Ex. user[email] -> email)
-    @_attributes = {}
 
 
   ##
@@ -82,44 +82,16 @@ class @Validator
   # validation.errors('all') # return all errors found
   # validation.errors('first', 'email') # return first error for the attribute email
   ##
-  errors: () ->
+  errors:
 
-    # Just return all errors
-    return @_errors
+    first: ->
 
-    ###
-    switch type
+    last: ->
 
-      when 'first'
+    all: ->
 
-        if @_errors[attribute]?
+    get: ->
 
-          return _.first(@_errors[attribute])
-
-      when 'last'
-
-        if @_errors[attribute]
-
-          return _.last(@_errors[attribute])
-
-      when 'all'
-
-        errors = []
-
-        _.each @_errors, (attributes) =>
-
-          for error in attributes
-
-            errors.push error
-
-        return errors
-        
-      when 'get'
-
-        if @_errors[attribute]?
-
-          return @_errors[attribute]
-    ###
     
   ##
   # Passes
@@ -153,7 +125,7 @@ class @Validator
   # @param [String] Message for this rule (Ex. Field :attribute must be valid)
   # 
   ##
-  error: (rule, message) ->
+  @error: (rule, message) ->
 
     @_messages[rule] = message
 
@@ -180,11 +152,11 @@ class @Validator
   # @param [Object] Attributes to add in the system
   # 
   ##
-  attributes: (attributes) ->
+  @attributes: (attributes) ->
 
-    _.each attributes, (attribute, index) =>
+    for index, attribute of attributes
 
-      @_attributes[index] = attribute
+      Validator._attributes[index] = attribute
 
 
   ##
@@ -195,9 +167,12 @@ class @Validator
   ##
   _run: ->
 
-    for input, rule of @_rulesToValidate
+    for input, rules of @_rulesToValidate
 
-      for index, value of rule
+      for index, value of rules
+
+        console.log index
+        console.log value
 
         if Validator._rules[index]? and @_datasToValidate[input]?
 
@@ -206,8 +181,8 @@ class @Validator
 
             @_success = false
 
-            if @_messages[index]?
-              error = @_createErrorMessage(@_messages[index], input, value)
+            if Validator._messages[index]?
+              error = @_createErrorMessage(Validator._messages[index], input, value)
             else
               error = '[Rule ' + index + '] No error message for this rule' 
 
@@ -223,30 +198,30 @@ class @Validator
   #
   # @param [String] Error string
   # @param [String] Attribute
-  # 
+  # @param [String] Values
   ##
   _createErrorMessage: (string, attribute, value) ->
 
-    if @_attributes[attribute]?
+    # Find if we need to humanify the attribute
+    if Validator._attributes[attribute]?
 
-      attribute = @_attributes[attribute]
+      attribute = Validator._attributes[attribute]
 
     string = string.split(':attribute').join(attribute)
 
-
-    if value?
+    if value.length > 0
 
       unless value.indexOf(',') is -1
 
-        string = string.split(':options').join(value.join(', '))
+        string = string.split(':values').join(value.join(', '))
 
       else
 
-        string = string.split(':options').join(value)
+        string = string.split(':values').join(value)
 
       for option, index in value
 
-        string = string.split(':option' + index).join(option)
+        string = string.split(':value' + (index+1)).join(option)
 
     return string
 
@@ -280,6 +255,6 @@ class @Validator
 
       else
 
-        parsed[rule] = {}
+        parsed[rule] = []
 
     return parsed
