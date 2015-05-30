@@ -130,7 +130,98 @@ Validator.rule('size', function(attribute, value, params) {
 });
 ```
 
+####```attribute(key, value)```
+Will replace in the error messages the attribute by the new value.
 
+```javascript
+Validator.attribute('user[email]', 'email');
+```
+
+####```attributes(attributes)```
+Like attribute() method but for a bunch of attributes.
+
+```javascript
+Validator.attribures({
+  "user[name]": "name",
+  "user_email": "email",
+  "user[password]": "password"
+});
+```
+
+####```make(datas, rules)```
+Perform the validation.
+
+```javascript
+datas = {
+  "email": "batman@gotham.io",
+  "name": "batman"
+};
+
+rules = {
+  "email": "required|email",
+  "name": "required|between:5,26"
+};
+
+validation = new Validator();
+
+validation.make(datas, rules);
+```
+
+####```passes()```
+Check if the validation passed
+
+```javascript
+if (validation.passes()) {
+  console.log("Yes !");
+}
+```
+
+####```fails()```
+Check if the validation failed
+
+```javascript
+if (validation.fails()) {
+  console.log("Nop :(");
+}
+```
+
+####```error(rule, message)```
+Add a template error for a rule
+
+```javascript
+Validator.error('between', 'The size of :attribute must be between :value1 and :value2 of length');
+```
+
+####```errors.all()```
+Return all messages errors
+
+```javascript
+console.log(validation.errors.all());
+```
+
+####```errors.first(field)```
+Return the first error for the field given
+
+```javascript
+console.log(validation.errors.first('username'));
+```
+
+####```errors.get(field)```
+Return all errors for the field given
+
+```javascript
+console.log(validation.errors.get('password'));
+```
+
+####```errors.has(field)```
+Determining if messages exist for a field
+
+```javascript
+if (validation.errors.has('password'))
+{
+  console.log(validation.error.get('password'));
+}
+```
 
 ## How to compile source files 
 
