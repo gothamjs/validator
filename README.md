@@ -111,6 +111,27 @@ bower install --save gotham-validator
 </body>
 ```
 
+## API
+
+####```rule(name, callback)```
+Add a new rule in the Validator class. The callback must return ```true``` or ```false```
+
+```javascript
+Validator.rule('size', function(attribute, value, params) {
+    size = value.toString().length;
+    
+    if (size === params[0])
+    {
+        return true;
+    } else {
+        return false;
+    }
+    
+});
+```
+
+
+
 ## How to compile source files 
 
 In the root of the project, execute that : 
