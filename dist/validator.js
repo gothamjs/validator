@@ -12,6 +12,31 @@
       this._datasToValidate = {};
       this._success = true;
       this._errors = {};
+      this.errors = {
+        all: (function(_this) {
+          return function() {
+            return _this._errors;
+          };
+        })(this),
+        first: (function(_this) {
+          return function(key) {
+            return _this._errors[key][0];
+          };
+        })(this),
+        get: (function(_this) {
+          return function(key) {
+            return _this._errors[key];
+          };
+        })(this),
+        has: (function(_this) {
+          return function(key) {
+            if (key in _this._errors) {
+              return true;
+            }
+            return false;
+          };
+        })(this)
+      };
     }
 
     Validator.prototype.make = function(datas, rules) {
@@ -25,13 +50,6 @@
         }
       }
       return this._run();
-    };
-
-    Validator.prototype.errors = {
-      first: function() {},
-      last: function() {},
-      all: function() {},
-      get: function() {}
     };
 
     Validator.prototype.passes = function() {
@@ -63,6 +81,10 @@
       return _results;
     };
 
+    Validator.attribute = function(key, value) {
+      return Validator._attributes[key] = value;
+    };
+
     Validator.prototype._run = function() {
       var error, index, input, result, rules, value, _ref, _results;
       _ref = this._rulesToValidate;
@@ -74,8 +96,6 @@
           _results1 = [];
           for (index in rules) {
             value = rules[index];
-            console.log(index);
-            console.log(value);
             if ((Validator._rules[index] != null) && (this._datasToValidate[input] != null)) {
               result = Validator._rules[index](input, this._datasToValidate[input], value, this._datasToValidate);
               if (!result) {

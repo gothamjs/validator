@@ -242,18 +242,22 @@ test('Must parse correctly the errors', 3, function() {
   deepEqual(validation._errors['fake'][0], 'It\'s a fake rule to test some values test and other and again')
 });
 
-test('Must parse correctly the custom attributes', 1, function() {
+test('Must parse correctly the custom attributes', 2, function() {
     
   Validator.attributes({
     "user[name]": "name"
   });
 
+  Validator.attribute('user[email]', 'email');
+
   datas = {
-    "user[name]": ""
+    "user[name]": "",
+    "user[email]": ""
   };
 
   rules = {
     "user[name]": "required",
+    "user[email]": "required"
   };
 
   validation = new Validator();
@@ -261,5 +265,58 @@ test('Must parse correctly the custom attributes', 1, function() {
   validation.make(datas, rules);
 
   deepEqual(validation._errors['user[name]'][0], 'The name is required');
+  deepEqual(validation._errors['user[email]'][0], 'The email is required');
+
+  // Reset attributes
+  Validator._attributes = {};
+
+});
+
+test('No problems with errors', 9, function() {
+
+  datas = {
+    "email": "",
+    "name": ""
+  };
+
+  rules = {
+    "email": "required|email",
+    "name": "required|size:5"
+
+  };
+  
+  validation = new Validator();
+
+  validation.make(datas, rules);
+
+  deepEqual(validation.errors.all(), {
+    "email": ['The email is required', 'The email must be an email'],
+    "name": ['The name is required', 'The size of name must be 5 length']
+  });
+
+  deepEqual(validation.errors.first('email'), 'The email is required');
+  deepEqual(validation.errors.first('name'), 'The name is required');
+
+  deepEqual(validation.errors.get('email'), ['The email is required', 'The email must be an email']);
+  deepEqual(validation.errors.get('name'), ['The name is required', 'The size of name must be 5 length']);
+
+  deepEqual(validation.errors.has('name'), true);
+  deepEqual(validation.errors.has('email'), true);
+  deepEqual(validation.errors.has('fake'), false);
+
+  // If i re run a new validation, errors must be flushed
+  datas = {
+    "email": "bonjours@gesjeremie.fr"
+  };
+
+  rules = {
+    "email": "email"
+  };
+
+  validation2 = new Validator();
+  validation2.make(datas, rules);
+
+  deepEqual(validation2.errors.all(), {});
+
 
 });

@@ -38,6 +38,28 @@ class @Validator
     # Each errors found after _run() method called
     @_errors = {}
 
+    @errors =
+
+      all: =>
+
+        return @_errors
+
+      first: (key) =>
+
+        return @_errors[key][0]
+
+      get: (key) =>
+
+        return @_errors[key]
+
+      has: (key) =>
+
+        if key of @_errors
+
+          return true
+
+        return false
+
 
   ##
   # Make
@@ -70,27 +92,6 @@ class @Validator
     # Run
     @_run()
 
-  ##
-  # Errors
-  #
-  # @param [String] Type request (Ex. all)
-  # @param [String] Attribute to fetch (opt)
-  # 
-  # @example 
-  #
-  # validation = new Validator()
-  # validation.errors('all') # return all errors found
-  # validation.errors('first', 'email') # return first error for the attribute email
-  ##
-  errors:
-
-    first: ->
-
-    last: ->
-
-    all: ->
-
-    get: ->
 
     
   ##
@@ -158,6 +159,19 @@ class @Validator
 
       Validator._attributes[index] = attribute
 
+  ##
+  # Attribute
+  #
+  # Humanify an attribute
+  #
+  # @param [string] Attribute to replace
+  # @param [string] The new value
+  # 
+  ##
+  @attribute: (key, value) ->
+
+    Validator._attributes[key] = value
+
 
   ##
   # Run
@@ -170,9 +184,6 @@ class @Validator
     for input, rules of @_rulesToValidate
 
       for index, value of rules
-
-        console.log index
-        console.log value
 
         if Validator._rules[index]? and @_datasToValidate[input]?
 
@@ -258,3 +269,4 @@ class @Validator
         parsed[rule] = []
 
     return parsed
+
