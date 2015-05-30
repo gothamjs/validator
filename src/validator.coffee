@@ -40,21 +40,56 @@ class @Validator
 
     @errors =
 
+      ##
+      # All
+      #
+      # Return all messages errors
+      #
+      # @return [Object]
+      # 
+      ##
       all: =>
 
         return @_errors
 
-      first: (key) =>
+      ##
+      # First
+      #
+      # Return the first message for the field given
+      #
+      # @param [String] The field to retrieve
+      # @return [String]
+      # 
+      ##
+      first: (field) =>
 
-        return @_errors[key][0]
+        return @_errors[field][0]
 
-      get: (key) =>
+      ##
+      # Get
+      #
+      # Return all messages for the field given
+      #
+      # @param [String] The field to retrieve
+      # @return [Array]
+      # 
+      ##
+      get: (field) =>
 
-        return @_errors[key]
+        return @_errors[field]
 
-      has: (key) =>
+      ##
+      # Has
+      #
+      # Determining if messages exist for a field
+      #
+      # @param [String] The field to check
+      # @return [Bool]
+      # 
+      ##
+      has: (field) =>
 
-        if key of @_errors
+        if field of @_errors
 
           return true
 

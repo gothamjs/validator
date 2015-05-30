@@ -19,18 +19,18 @@
           };
         })(this),
         first: (function(_this) {
-          return function(key) {
-            return _this._errors[key][0];
+          return function(field) {
+            return _this._errors[field][0];
           };
         })(this),
         get: (function(_this) {
-          return function(key) {
-            return _this._errors[key];
+          return function(field) {
+            return _this._errors[field];
           };
         })(this),
         has: (function(_this) {
-          return function(key) {
-            if (key in _this._errors) {
+          return function(field) {
+            if (field in _this._errors) {
               return true;
             }
             return false;
