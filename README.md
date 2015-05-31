@@ -192,6 +192,18 @@ Add a template error for a rule
 Validator.error('between', 'The size of :attribute must be between :value1 and :value2 of length');
 ```
 
+####```errors(messages)```
+Add some template errors for the rules
+
+```javascript
+Validator.errors({
+  required: 'The :attribute is required',
+  between: 'The size of :attribute must be between :value1 and :value2 of length'
+});
+```
+
+
+
 ####```errors.all()```
 Return all messages errors
 
