@@ -67,6 +67,16 @@
       return this._messages[rule] = message;
     };
 
+    Validator.errors = function(messages) {
+      var message, rule, _results;
+      _results = [];
+      for (rule in messages) {
+        message = messages[rule];
+        _results.push(this._messages[rule] = message);
+      }
+      return _results;
+    };
+
     Validator.rule = function(name, callback) {
       return this._rules[name] = callback;
     };

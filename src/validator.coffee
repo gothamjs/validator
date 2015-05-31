@@ -166,6 +166,19 @@ class @Validator
     @_messages[rule] = message
 
   ##
+  # Errors
+  #
+  # Add a new bunch of errors for rules
+  #
+  # @param [Object] The messages
+  # 
+  ##
+  @errors: (messages) ->
+
+    for rule, message of messages 
+
+      @_messages[rule] = message
+  ##
   # Rule
   #
   # Add a new rule function in the class

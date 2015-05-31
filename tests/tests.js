@@ -13,10 +13,25 @@ test("Can mount rules", 2, function() {
   Validator._rules = {};
 });
 
-test("Can mount errors", 2, function() {
+test("Can mount an error", 2, function() {
 
   Validator.error('required', 'The :attribute is required');
   Validator.error('email', 'The :attribute must be an email');
+
+  deepEqual(Validator._messages['required'], 'The :attribute is required');
+  deepEqual(Validator._messages['email'], 'The :attribute must be an email');
+
+  Validator._messages = {};
+
+});
+
+
+test("Can mount a couple of errors", 2, function() {
+
+  Validator.errors({
+    required: 'The :attribute is required',
+    email: 'The :attribute must be an email'
+  });
 
   deepEqual(Validator._messages['required'], 'The :attribute is required');
   deepEqual(Validator._messages['email'], 'The :attribute must be an email');
